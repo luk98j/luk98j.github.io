@@ -9,19 +9,24 @@
         </canvas>
         <script type="text/javascript">
             var i = 0;
-            function change() {
-                var canvas = document.getElementById("circle");
-                var ctx = canvas.getContext("2d");
-                ctx.beginPath();
-                var color = ["green", "blue",];
-                ctx.fillStyle = color[i];
-                i = (i + 1) % color.length;
-                ctx.arc(95,50,40,0,2*Math.PI);
-                ctx.fill();
-                ctx.stroke();
-            }
+            var canvas = document.getElementById("circle");
+            var ctx = canvas.getContext("2d");
+            ctx.beginPath();
+            ctx.arc(150,150,150,0,2*Math.PI);
+            ctx.stroke();
             setInterval(change, 1000);            
             
+
+            function change() {
+                var color = ["green", "blue",];
+                var grd = ctx.createLinearGradient(0, 0, 200, 0);
+                grd.addColorStop(0, color[0]);
+                grd.addColorStop(1, color[1]);
+                //ctx.fillStyle = color[i];
+                ctx.fillStyle = grd;
+                i = (i + 1) % color.length;
+                ctx.fill();
+            }
         </script> 
         
     </body>
