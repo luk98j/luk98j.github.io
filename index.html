@@ -4,16 +4,25 @@
         
     </head>
     <body>
-        <canvas id="myCanvas" width="800" height="600">
+        <canvas id="circle" width="800" height="600">
             Your browser does not support the HTML canvas tag.
         </canvas>
-        <script>
-            var canvas = document.getElementById("myCanvas");
-            var ctx = canvas.getContext("2d");
-            ctx.beginPath();
-            ctx.arc(95,50,40,0,2*Math.PI);
+        <script type="text/javascript">
+            var i = 0;
+            function change() {
+                var canvas = document.getElementById("circle");
+                var ctx = canvas.getContext("2d");
+                ctx.beginPath();
+                var color = ["green", "blue",];
+                ctx.fillStyle = color[i];
+                i = (i + 1) % color.length;
+                ctx.arc(95,50,40,0,2*Math.PI);
+                ctx.fill();
+                ctx.stroke();
+            }
+            setInterval(change, 1000);            
             
-            ctx.stroke();
-            </script> 
+        </script> 
+        
     </body>
 </html>
