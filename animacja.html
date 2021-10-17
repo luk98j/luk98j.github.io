@@ -8,29 +8,50 @@
         </canvas>
 
         <script type="text/javascript">
+            var points = 0;
             var canvas = document.getElementById("rectangle");
             var ctx = canvas.getContext("2d");
-            var rectangleWidth = 100;
-            var rectangleHeight = 50;
+            base_image = new Image();
+            base_image.src = 'tank.png';
+            base_image.onload = function(){
+                drawRect();
+            }
+            var rectangleWidth = 75;
+            var rectangleHeight = 75;
             var xCordinate = canvas.width/2-rectangleHeight;
             var yCorindate = canvas.height-rectangleHeight;
-            drawRect();
             var ballArray = [];
             var ballPoints = [];
+            var colorArray = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', 
+                '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
+                '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', 
+                '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
+                '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC', 
+                '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
+                '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680', 
+                '#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
+                '#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3', 
+                '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'];
             window.addEventListener("keydown", moveSomething, false);
-            setInterval(movingBall,200)
-
-            function drawRect(){
-                ctx.fillStyle = '#666';
-                ctx.fillRect(xCordinate, yCorindate, rectangleWidth, rectangleHeight);
+            setInterval(movingBall,100)
+            setInterval(drawPoints,300)
+            function drawRect()
+            {
+                ctx.drawImage(base_image, xCordinate, yCorindate, rectangleWidth, rectangleHeight);
             }
+
+            // function drawRect(){
+            //     //ctx.fillStyle = 'rgba(17, 91, 24, 0.8)';
+            //     //ctx.fillRect(xCordinate, yCorindate, rectangleWidth, rectangleHeight);
+            //     ctx.drawImage(i)
+            // }
+            
             
             function moveSomething(e) {
                 ctx.clearRect(xCordinate, yCorindate, rectangleWidth, rectangleHeight);
                 switch(e.keyCode) {
                     case 37:
                         // left key pressed
-                        console.log("XD")
                         if(xCordinate !=0){
                             xCordinate -= 5;
                         } else {
@@ -57,33 +78,70 @@
                 var x = xCordinate + rectangleWidth/2;
                 var ballY = yCorindate - rectangleHeight - 10;
                 var radius = 10
-                var ball = new Ball(x,ballY, radius, "blue");
+                var ball = new Ball(x,ballY, radius, "rgba(146, 165, 70, 0.8)");
                 ball.draw()
                 ballArray.push(ball);
             }
 
             function movingBall(ball){
                 for(var i = 0; i<ballArray.length;i++){
-                    console.log(ballArray.length)
-                    console.log(ballArray[i].y)
                     if( ballArray[i].y == 0){
                         ballArray[i].delete()
                         ballArray.splice(i,1)
                     } else {
-                        ballArray[i].update();
-                        ballArray[i].draw();
+                        if(checkIfTargetIsHit(ballArray[i])){
+                            points += 1;
+                            console.log(points)
+                            ballArray[i].delete()
+                            ballArray.splice(i,1)
+                        } else {
+                            ballArray[i].update();
+                            ballArray[i].draw();
+                        }
                     }
                     
                 }
             }
 
+            function checkIfTargetIsHit(ball){
+                for(var i=0;i<ballPoints.length;i++){
+                    if((ballPoints[i].x + radius+6) >= ball.x
+                    &&  (ballPoints[i].x - radius+6) <= ball.x &&
+                    (ballPoints[i].y + radius+6) >= ball.y
+                    &&  (ballPoints[i].y - radius+6) <= ball.y )
+                    {
+                        ballPoints[i].deletePoint()
+                        ballPoints.splice(i,1)
+                        return true;
+                        break;
+                    }
+                }
+            }
+
             function drawPoints(){
-                if(ballPoints.length <5){
-                    radius = 30
+                if(ballPoints.length <6){
+                    radius = 20
                     x = getRandomInt(radius * 2 ,canvas.width-radius*2)
-                    var pointBall = new Ball(x,y, 30, "red");
+                    y = 30;
+                    if(!checkPointsAreNotClose(x,radius)){
+                        color = getRandomInt(0, colorArray.length-1)
+                        var pointBall = new Ball(x,y, radius, colorArray[color]);
+                        pointBall.draw()
+                        ballPoints.push(pointBall);
+                    } 
+                    
                 }
 
+            }
+            function checkPointsAreNotClose(x,radius){
+                for(var i=0;i<ballPoints.length;i++){
+                    if((ballPoints[i].x + radius + 20) >= x
+                    &&  (ballPoints[i].x - radius - 20) <= x )
+                    {
+                        return true;
+                        break;
+                    }
+                }
             }
 
             function getRandomInt(min, max) {
@@ -101,7 +159,7 @@
 
             Ball.prototype = {
                 draw: function() {
-                    ctx.clearRect(this.x - 10 ,this.y,20,20)
+                    ctx.clearRect(this.x - 10,this.y,21,21)
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
                     ctx.fillStyle = this.color;
@@ -114,8 +172,11 @@
                 },
 
                 delete: function(){
-                    ctx.clearRect(this.x - 10 ,this.y,20,20)
-                }
+                    ctx.clearRect(this.x-this.radius,this.y-this.radius,this.radius*2+1,this.radius*2+1)
+                },
+                deletePoint: function(){
+                    ctx.clearRect(this.x-radius,this.y-radius,this.radius*2,this.radius*2)
+                },
             };
         </script> 
         
