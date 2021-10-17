@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+    </head>
+    <body>
+        <canvas id="rectangle" width="800" height="600" style="border:1px solid #000000;">
+        </canvas>
+
+        <script type="text/javascript">
+            var canvas = document.getElementById("rectangle");
+            var ctx = canvas.getContext("2d");
+            var xCordinate = canvas.width/2-50;
+            var yCorindate = canvas.height-50;
+            window.addEventListener("keyleft", moveSomething, false);
+            window.addEventListener("keyright", moveSomething, false);
+            
+
+            function init(){
+                ctx.beginPath();
+                ctx.rect(xCordinate, yCorindate, 100, 50);
+                ctx.stroke();
+            }
+            
+            function moveSomething(e) {
+                switch(e.keyCode) {
+                    case 37:
+                        // left key pressed
+                        console.log("XD")
+                        xCordinate -= 2;
+                        break;
+                    case 39:
+                        // right key pressed
+                        xCordinate += 2;
+                        break;
+                }   
+                init();
+            }      
+            
+            
+        </script> 
+        
+    </body>
+</html>
