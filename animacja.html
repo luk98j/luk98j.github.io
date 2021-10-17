@@ -10,15 +10,13 @@
         <script type="text/javascript">
             var canvas = document.getElementById("rectangle");
             var ctx = canvas.getContext("2d");
-            var xCordinate = canvas.width/2-50;
-            var yCorindate = canvas.height-50;
             var rectangleWidth = 100;
             var rectangleHeight = 50;
-            //ctx.beginPath();
+            var xCordinate = canvas.width/2-rectangleHeight;
+            var yCorindate = canvas.height-rectangleHeight;
+            var ballY = 0
             drawRect();
-            //ctx.stroke();
             window.addEventListener("keydown", moveSomething, false);
-            //window.addEventListener("keyright", moveSomething, false);
             
 
             function drawRect(){
@@ -47,12 +45,35 @@
                         }
                         break;
                     case 32:
+                        // spacja 
                         console.log("SPACJA")
+                        shootBall();
                         break;
                 }   
-               
                 drawRect();
-            }      
+            }
+            
+            function shootBall(){
+                var x = xCordinate + rectangleWidth/2;
+                ballY = yCorindate - rectangleHeight - 10;
+                ctx.beginPath();
+                ctx.fillStyle = 'blue';
+                ctx.arc(x,ballY,10,0,2*Math.PI);
+                ctx.fill();
+                ctx.closePath();
+                var pastCordinate = setInterval(movingBall, 100);
+                function movingBall(){
+                    ctx.beginPath();
+                    ctx.clearRect(x-10,ballY,20,20)
+                    ctx.fillStyle = 'blue';
+                    ballY -= 10;
+                    ctx.arc(x,ballY,10,0,2*Math.PI);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+            
+            
             
             
         </script> 
