@@ -33,6 +33,7 @@
                 '#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3', 
                 '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'];
             window.addEventListener("keydown", moveSomething, false);
+            setInterval(printPoints,50)
             setInterval(movingBall,100)
             setInterval(drawPoints,300)
             function drawRect()
@@ -40,11 +41,12 @@
                 ctx.drawImage(base_image, xCordinate, yCorindate, rectangleWidth, rectangleHeight);
             }
 
-            // function drawRect(){
-            //     //ctx.fillStyle = 'rgba(17, 91, 24, 0.8)';
-            //     //ctx.fillRect(xCordinate, yCorindate, rectangleWidth, rectangleHeight);
-            //     ctx.drawImage(i)
-            // }
+            function printPoints(){
+                ctx.clearRect(canvas.width-75,0,150,15);
+                ctx.fillStyle = "Red";
+                ctx.font = "15px Georgia";
+                ctx.fillText("Punkty :" + points,canvas.width-75,13);
+            }
             
             
             function moveSomething(e) {
@@ -122,7 +124,7 @@
                 if(ballPoints.length <6){
                     radius = 20
                     x = getRandomInt(radius * 2 ,canvas.width-radius*2)
-                    y = 30;
+                    y = 50;
                     if(!checkPointsAreNotClose(x,radius)){
                         color = getRandomInt(0, colorArray.length-1)
                         var pointBall = new Ball(x,y, radius, colorArray[color]);
@@ -178,6 +180,10 @@
                     ctx.clearRect(this.x-radius,this.y-radius,this.radius*2,this.radius*2)
                 },
             };
+
+            function PointText(x,y){
+
+            }
         </script> 
         
     </body>
