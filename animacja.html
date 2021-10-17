@@ -15,8 +15,10 @@
             var xCordinate = canvas.width/2-rectangleHeight;
             var yCorindate = canvas.height-rectangleHeight;
             drawRect();
+            var ballArray = [];
+            var ballPoints = [];
             window.addEventListener("keydown", moveSomething, false);
-            window.addEventListener("keyup", moveSomething, false);
+            setInterval(movingBall,200)
 
             function drawRect(){
                 ctx.fillStyle = '#666';
@@ -45,7 +47,6 @@
                         break;
                     case 32:
                         // spacja 
-                        console.log("SPACJA")
                         shootBall();
                         break;
                 }   
@@ -55,42 +56,52 @@
             function shootBall(){
                 var x = xCordinate + rectangleWidth/2;
                 var ballY = yCorindate - rectangleHeight - 10;
-                // ctx.beginPath();
-                // ctx.fillStyle = 'blue';
-                // ctx.arc(x,ballY,10,0,2*Math.PI);
-                // ctx.fill();
-                // ctx.closePath();
-                // var pastCordinate = setInterval(movingBall, 100);
-                // function movingBall(){
-                //     ctx.beginPath();
-                //     ctx.clearRect(x-10,ballY,20,20)
-                //     ctx.fillStyle = 'blue';
-                //     ballY -= 10;
-                //     ctx.arc(x,ballY,10,0,2*Math.PI);
-                //     ctx.closePath();
-                //     ctx.fill();
-                // }
-                var ball = new Ball(x,ballY);
+                var radius = 10
+                var ball = new Ball(x,ballY, radius, "blue");
                 ball.draw()
-                setInterval(movingBall(ball),300)
+                ballArray.push(ball);
             }
 
             function movingBall(ball){
-                console.log(ball.y)
-                ball.update()
-                ball.draw()
+                for(var i = 0; i<ballArray.length;i++){
+                    console.log(ballArray.length)
+                    console.log(ballArray[i].y)
+                    if( ballArray[i].y == 0){
+                        ballArray[i].delete()
+                        ballArray.splice(i,1)
+                    } else {
+                        ballArray[i].update();
+                        ballArray[i].draw();
+                    }
+                    
+                }
             }
 
-            function Ball(x, y) {
+            function drawPoints(){
+                if(ballPoints.length <5){
+                    radius = 30
+                    x = getRandomInt(radius * 2 ,canvas.width-radius*2)
+                    var pointBall = new Ball(x,y, 30, "red");
+                }
+
+            }
+
+            function getRandomInt(min, max) {
+                min = Math.ceil(min);
+                max = Math.floor(max);
+                return Math.floor(Math.random() * (max - min)) + min;
+            }
+
+            function Ball(x, y, radius, color) {
                 this.x = x;
                 this.y = y;
-                this.radius = 10;
-                this.color = "blue";
+                this.radius = radius;
+                this.color = color;
             }
 
             Ball.prototype = {
                 draw: function() {
-                    ctx.clearRect(this.x,this.y,20,20)
+                    ctx.clearRect(this.x - 10 ,this.y,20,20)
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
                     ctx.fillStyle = this.color;
@@ -99,13 +110,13 @@
                 },
 
                 update: function() {
-                    this.y -= 10;
+                    this.y = this.y -10;
+                },
+
+                delete: function(){
+                    ctx.clearRect(this.x - 10 ,this.y,20,20)
                 }
             };
-
-            
-            
-            
         </script> 
         
     </body>
