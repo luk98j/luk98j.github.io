@@ -14,10 +14,9 @@
             var rectangleHeight = 50;
             var xCordinate = canvas.width/2-rectangleHeight;
             var yCorindate = canvas.height-rectangleHeight;
-            var ballY = 0
             drawRect();
             window.addEventListener("keydown", moveSomething, false);
-            
+            window.addEventListener("keyup", moveSomething, false);
 
             function drawRect(){
                 ctx.fillStyle = '#666';
@@ -55,24 +54,55 @@
             
             function shootBall(){
                 var x = xCordinate + rectangleWidth/2;
-                ballY = yCorindate - rectangleHeight - 10;
-                ctx.beginPath();
-                ctx.fillStyle = 'blue';
-                ctx.arc(x,ballY,10,0,2*Math.PI);
-                ctx.fill();
-                ctx.closePath();
-                var pastCordinate = setInterval(movingBall, 100);
-                function movingBall(){
-                    ctx.beginPath();
-                    ctx.clearRect(x-10,ballY,20,20)
-                    ctx.fillStyle = 'blue';
-                    ballY -= 10;
-                    ctx.arc(x,ballY,10,0,2*Math.PI);
-                    ctx.closePath();
-                    ctx.fill();
-                }
+                var ballY = yCorindate - rectangleHeight - 10;
+                // ctx.beginPath();
+                // ctx.fillStyle = 'blue';
+                // ctx.arc(x,ballY,10,0,2*Math.PI);
+                // ctx.fill();
+                // ctx.closePath();
+                // var pastCordinate = setInterval(movingBall, 100);
+                // function movingBall(){
+                //     ctx.beginPath();
+                //     ctx.clearRect(x-10,ballY,20,20)
+                //     ctx.fillStyle = 'blue';
+                //     ballY -= 10;
+                //     ctx.arc(x,ballY,10,0,2*Math.PI);
+                //     ctx.closePath();
+                //     ctx.fill();
+                // }
+                var ball = new Ball(x,ballY);
+                ball.draw()
+                setInterval(movingBall(ball),300)
             }
-            
+
+            function movingBall(ball){
+                console.log(ball.y)
+                ball.update()
+                ball.draw()
+            }
+
+            function Ball(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 10;
+                this.color = "blue";
+            }
+
+            Ball.prototype = {
+                draw: function() {
+                    ctx.clearRect(this.x,this.y,20,20)
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                    ctx.closePath();
+                },
+
+                update: function() {
+                    this.y -= 10;
+                }
+            };
+
             
             
             
