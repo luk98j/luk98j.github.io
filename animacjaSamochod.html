@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    </head>
+    <body>
+        <canvas id="road-rectangle" width="800" height="600" style="border:1px solid #000000;">
+        </canvas>
+
+        <script type="text/javascript">
+            var canvas = document.getElementById("road-rectangle");
+            var ctx = canvas.getContext("2d");
+            var widthOfGrass = canvas.width;
+            var heightOfGrass = canvas.height;
+            var rectangleWidth = 35;
+            var rectangleHeight = 35;
+            var xCordinate = canvas.width/2-rectangleHeight;
+            var yCorindate = canvas.height-rectangleHeight;
+            setInterval(initRoad,100)
+            
+            window.addEventListener("keydown", moveSomething, false);
+        
+            
+            function initRoad(){
+                ctx.fillStyle = "green";
+                ctx.fillRect(0, 0, widthOfGrass, heightOfGrass);
+                
+            }
+
+            function moveSomething(e) {
+                ctx.clearRect(xCordinate, yCorindate, rectangleWidth, rectangleHeight);
+                switch(e.keyCode) {
+                    case 37:
+                        // left key pressed
+                        if(xCordinate !=0){
+                            xCordinate -= 5;
+                        } else {
+                            drawCar();
+                        }
+                        break;
+                    case 39:
+                        // right key pressed
+                        if(xCordinate != canvas.width-75){
+                            xCordinate += 5;
+                        } else{
+                            drawCar();
+                        }
+                        break;
+                }   
+                drawCar();
+            }
+
+            function drawCar(){
+                var car = new Car(xCordinate, yCorindate, rectangleWidth, rectangleHeight)
+                car.update()
+                car.delete()
+                car.draw()
+            }
+
+            function Road(x,y,width,height){
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+            }
+
+            Road.prototype = {
+                draw: function() {
+                    ctx.beginPath();
+                    ctx.rect(this.x,this.y,this.width,this.height);
+                    ctx.stroke();
+                },
+                update: function() {
+                    
+                },
+                delete: function(){
+
+                },
+            }
+
+            function Car(x, y, width, height) {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+            }
+
+            Car.prototype = {
+                draw: function() {
+                    ctx.beginPath();
+                    ctx.rect(this.x,this.y,this.width,this.height);
+                    ctx.stroke();
+                },
+                update: function() {
+                    this.x = xCordinate;
+                },
+                delete: function(){
+                    ctx.clearRect(this.x,this.y,this.width,this.height)
+                },
+            };
+
+        </script>
+    </body>
+</html>
