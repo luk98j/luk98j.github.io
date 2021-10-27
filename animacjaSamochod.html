@@ -3,7 +3,7 @@
     <head>
     </head>
     <body>
-        <canvas id="road-rectangle" width="800" height="600" style="border:1px solid #000000;">
+        <canvas id="road-rectangle" width="800" height="600" style="border:1px solid #000000; background-color: green;">
         </canvas>
 
         <script type="text/javascript">
@@ -13,21 +13,50 @@
             var heightOfGrass = canvas.height;
             var rectangleWidth = 35;
             var rectangleHeight = 35;
-            var xCordinate = canvas.width/2-rectangleHeight;
+            var apexWidth=30;
+            var xCordinateRoad = 200;
+            var xCordinate = (canvas.width/2);
             var yCorindate = canvas.height-rectangleHeight;
-            setInterval(initRoad,100)
-            
+            var roadArray = []; // divide road to ten
+            var lastY;
+            var whiteLine;
             window.addEventListener("keydown", moveSomething, false);
-        
+            var firstInit = true;
+            setInterval(initRoad,150)
             
             function initRoad(){
-                ctx.fillStyle = "green";
-                ctx.fillRect(0, 0, widthOfGrass, heightOfGrass);
-                
+                if(firstInit){
+                    initDrawRoad();
+                    firstInit = false;
+                } else {
+                    drawRoad();
+                }
+                drawCar()
+            }
+
+            function drawRoad(){
+                if(roadArray.length == 10){
+                    for(var i = 0;i<roadArray.length;i++){
+                        console.log(roadArray.length)
+                        if(i==0){
+                            roadArray[i].delete()
+                            roadArray.splice(i,1)
+                        }
+                        roadArray[i].delete()
+                        roadArray[i].update()
+                        roadArray[i].draw() 
+                    }
+                    lastY = roadArray[roadArray.length-1].y;
+                    whiteLine = roadArray[roadArray.length-1].whiteLine;
+                    var y = lastY - 60;
+                    var road = new Road(xCordinateRoad,y,400,60,!whiteLine);
+                    road.draw()
+                    roadArray.push(road);
+                } 
             }
 
             function moveSomething(e) {
-                ctx.clearRect(xCordinate, yCorindate, rectangleWidth, rectangleHeight);
+                //ctx.clearRect(xCordinate, yCorindate, rectangleWidth, rectangleHeight);
                 switch(e.keyCode) {
                     case 37:
                         // left key pressed
@@ -56,26 +85,58 @@
                 car.draw()
             }
 
-            function Road(x,y,width,height){
+            function initDrawRoad(){
+                for(var i=1;i<=10;i++){
+                        var y = canvas.height - 60 * i;
+                        var road;
+                    if(i%2==0){
+                        road = new Road(xCordinateRoad,y,400,60,true);
+                    } else {
+                        road = new Road(xCordinateRoad,y,400,60,false);
+                    }
+                    road.draw()
+                    roadArray.push(road);
+                }
+            }
+            function Road(x,y,width,height,whiteLine){
                 this.x = x;
                 this.y = y;
                 this.width = width;
                 this.height = height;
+                this.whiteLine = whiteLine
             }
 
             Road.prototype = {
                 draw: function() {
-                    ctx.beginPath();
-                    ctx.rect(this.x,this.y,this.width,this.height);
-                    ctx.stroke();
+                    if(this.whiteLine){
+                        ctx.beginPath();
+                        ctx.fillStyle = 'gray'
+                        ctx.fillRect(this.x,this.y,this.width,this.height);
+                        ctx.fillStyle = "red"
+                        ctx.fillRect(this.x-apexWidth,this.y,apexWidth,this.height);
+                        ctx.fillRect(this.x+this.width,this.y,apexWidth,this.height);
+                        ctx.fillStyle = "white"
+                        ctx.fillRect(this.x+this.width/2,this.y,apexWidth-15,this.height);
+                        ctx.stroke();
+                    } else {
+                        ctx.beginPath();
+                        ctx.fillStyle = 'gray'
+                        ctx.fillRect(this.x,this.y,this.width,this.height);
+                        ctx.fillStyle = "white"
+                        ctx.fillRect(this.x-apexWidth,this.y,apexWidth,this.height);
+                        ctx.fillRect(this.x+this.width,this.y,apexWidth,this.height);
+                        ctx.stroke();
+                    }
+                   
                 },
                 update: function() {
-                    
+                    this.y = this.y + this.height;
                 },
                 delete: function(){
-
+                    ctx.clearRect(this.x-apexWidth,this.y,this.width+apexWidth+apexWidth,this.height)
                 },
             }
+
 
             function Car(x, y, width, height) {
                 this.x = x;
@@ -87,7 +148,8 @@
             Car.prototype = {
                 draw: function() {
                     ctx.beginPath();
-                    ctx.rect(this.x,this.y,this.width,this.height);
+                    ctx.fillStyle = 'red'
+                    ctx.fillRect(this.x,this.y,this.width,this.height);
                     ctx.stroke();
                 },
                 update: function() {
