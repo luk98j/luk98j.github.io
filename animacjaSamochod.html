@@ -14,15 +14,19 @@
             var rectangleWidth = 35;
             var rectangleHeight = 35;
             var apexWidth=30;
-            var xCordinateRoad = 200;
+            var xCordinateRoad = 225;
             var xCordinate = (canvas.width/2);
             var yCorindate = canvas.height-rectangleHeight;
             var roadArray = []; // divide road to ten
+            var roadSizePx = 270;
+            var onePieceRoadH = 60;
+            var howOftenChangeRoad = 10;
             var lastY;
             var whiteLine;
+            var roadChanges = 1;
             window.addEventListener("keydown", moveSomething, false);
             var firstInit = true;
-            setInterval(initRoad,150)
+            setInterval(initRoad,300)
             
             function initRoad(){
                 if(firstInit){
@@ -35,24 +39,53 @@
             }
 
             function drawRoad(){
+                
+                var random = randomIntFromInterval(0,5)
+                var changeSize = randomIntFromInterval(8,30)
+                console.log(random)
                 if(roadArray.length == 10){
                     for(var i = 0;i<roadArray.length;i++){
-                        console.log(roadArray.length)
                         if(i==0){
                             roadArray[i].delete()
                             roadArray.splice(i,1)
                         }
-                        roadArray[i].delete()
-                        roadArray[i].update()
-                        roadArray[i].draw() 
+                        if(roadChanges%howOftenChangeRoad==0){
+                            if(random%2==0){
+                                
+                                roadArray[i].delete()
+                                if(roadArray[i-1]!=undefined){
+                                    roadArray[i].updateWithShiftPlus(changeSize*i,roadArray[i-1].x)
+                                } else {
+                                    roadArray[i].updateWithShiftPlus(changeSize*i,roadArray[i].x)
+                                }
+                                roadArray[i].draw() 
+                            } else {
+                                roadArray[i].delete()
+                                if(roadArray[i-1]!=undefined){
+                                    roadArray[i].updateWithShiftMinus(changeSize*i,roadArray[i-1].x)
+                                } else {
+                                    roadArray[i].updateWithShiftMinus(changeSize*i,roadArray[i].x)
+                                }
+                                
+                                roadArray[i].draw() 
+                            }
+                        } else {
+                            roadArray[i].delete()
+                            roadArray[i].update()
+                            roadArray[i].draw() 
+                        }
+                        
                     }
                     lastY = roadArray[roadArray.length-1].y;
+                    lastX = roadArray[roadArray.length-1].x;
                     whiteLine = roadArray[roadArray.length-1].whiteLine;
-                    var y = lastY - 60;
-                    var road = new Road(xCordinateRoad,y,400,60,!whiteLine);
+                    var y = lastY - onePieceRoadH;
+                    var x = lastX
+                    var road = new Road(lastX,y,roadSizePx,onePieceRoadH,!whiteLine);
                     road.draw()
                     roadArray.push(road);
                 } 
+                roadChanges++;
             }
 
             function moveSomething(e) {
@@ -78,6 +111,10 @@
                 drawCar();
             }
 
+            
+            function randomIntFromInterval(min, max) { // min and max included 
+                return Math.floor(Math.random() * (max - min + 1) + min)
+            }
             function drawCar(){
                 var car = new Car(xCordinate, yCorindate, rectangleWidth, rectangleHeight)
                 car.update()
@@ -87,12 +124,12 @@
 
             function initDrawRoad(){
                 for(var i=1;i<=10;i++){
-                        var y = canvas.height - 60 * i;
+                        var y = canvas.height - onePieceRoadH * i;
                         var road;
                     if(i%2==0){
-                        road = new Road(xCordinateRoad,y,400,60,true);
+                        road = new Road(xCordinateRoad,y,roadSizePx,onePieceRoadH,true);
                     } else {
-                        road = new Road(xCordinateRoad,y,400,60,false);
+                        road = new Road(xCordinateRoad,y,roadSizePx,onePieceRoadH,false);
                     }
                     road.draw()
                     roadArray.push(road);
@@ -131,6 +168,23 @@
                 },
                 update: function() {
                     this.y = this.y + this.height;
+                },
+                updateWithShiftPlus: function(variable,diffrentX){
+                    this.y = this.y + this.height;
+                    if(this.x + variable <= canvas.width){
+                        this.x = this.x + variable;
+                    } else{
+                        this.x = diffrentX
+                    }
+                    
+                },
+                updateWithShiftMinus: function(variable, diffrentX){
+                    this.y = this.y + this.height;
+                    if(this.x - variable > apexWidth){
+                        this.x = this.x - variable;
+                    } else{
+                        this.x = diffrentX
+                    }
                 },
                 delete: function(){
                     ctx.clearRect(this.x-apexWidth,this.y,this.width+apexWidth+apexWidth,this.height)
