@@ -12,7 +12,7 @@
             var widthOfGrass = canvas.width;
             var heightOfGrass = canvas.height;
             var rectangleWidth = 35;
-            var rectangleHeight = 35;
+            var rectangleHeight = 50;
             var apexWidth=30;
             var xCordinateRoad = 225;
             var xCordinate = (canvas.width/2);
@@ -20,16 +20,29 @@
             var roadArray = []; // divide road to ten
             var roadSizePx = 270;
             var onePieceRoadH = 60;
-            var howOftenChangeRoad = 10;
+            var howOftenChangeRoad = 15;
             var lastY;
             var whiteLine;
             var roadChanges = 1;
+            var isGameOver = false;
+            var car = null
+            var pointR=5
+            var score = 0;
+            base_image = new Image();
+            base_image.src = 'car.png';
+            
             window.addEventListener("keydown", moveSomething, false);
             var firstInit = true;
             setInterval(initRoad,300)
             
             function initRoad(){
+                printScore()
                 if(firstInit){
+                   
+                    car = new Car(xCordinate, yCorindate, rectangleWidth, rectangleHeight)
+                    base_image.onload = function(){
+                        drawCar();
+                    }
                     initDrawRoad();
                     firstInit = false;
                 } else {
@@ -39,11 +52,11 @@
             }
 
             function drawRoad(){
-                
                 var random = randomIntFromInterval(0,5)
                 var changeSize = randomIntFromInterval(8,30)
-                console.log(random)
-                if(roadArray.length == 10){
+                if(roadArray.length < 20){
+                    checkColisionWithCar(roadArray[0])
+                    
                     for(var i = 0;i<roadArray.length;i++){
                         if(i==0){
                             roadArray[i].delete()
@@ -51,7 +64,6 @@
                         }
                         if(roadChanges%howOftenChangeRoad==0){
                             if(random%2==0){
-                                
                                 roadArray[i].delete()
                                 if(roadArray[i-1]!=undefined){
                                     roadArray[i].updateWithShiftPlus(changeSize*i,roadArray[i-1].x)
@@ -74,41 +86,95 @@
                             roadArray[i].update()
                             roadArray[i].draw() 
                         }
-                        
                     }
                     lastY = roadArray[roadArray.length-1].y;
                     lastX = roadArray[roadArray.length-1].x;
                     whiteLine = roadArray[roadArray.length-1].whiteLine;
                     var y = lastY - onePieceRoadH;
                     var x = lastX
-                    var road = new Road(lastX,y,roadSizePx,onePieceRoadH,!whiteLine);
+                    var road = null
+                    var pointsCreate = null;
+                    if(randomIntFromInterval(0,100)%2==0){
+                        pointsCreate = new Points(lastX+randomIntFromInterval(0,roadSizePx-pointR), lastY)
+                    }
+                    if(roadChanges%5==0){
+                        road = new Road(lastX,y,roadSizePx,onePieceRoadH,!whiteLine,
+                         new ObjectOnRoad(lastX+randomIntFromInterval(0,roadSizePx-90),lastY),pointsCreate);
+                    } else{
+                        road = new Road(lastX,y,roadSizePx,onePieceRoadH,!whiteLine, null,pointsCreate);
+                    }
+                    pointsCreate = null;
                     road.draw()
                     roadArray.push(road);
                 } 
                 roadChanges++;
             }
 
+            function scorePoints(){
+                score++;
+                printScore()
+            }
+
+            function printScore(){
+                ctx.font = "15px Arial";
+                ctx.clearRect(0,0,50,50)
+                ctx.fillText("P: " + score, 20, 20);
+                
+            }
+
+            function checkColisionWithCar(road){
+                if(road.point!=null){
+                    if((road.point.x >= car.x || road.point.x + road.point.r <= car.width)){
+                        console.log("Trafiony")
+                        scorePoints()
+                    }
+                }
+                if(car.x <= road.x){
+                    gameOver()
+                } 
+                if(car.x+rectangleWidth >= road.x + roadSizePx){
+                    gameOver()
+                }
+                if(road.objectOnRoad != null) {
+                    if(road.objectOnRoad.x <= car.x && road.objectOnRoad.x+road.objectOnRoad.width >= car.x ){
+                        gameOver()
+                    }
+                    if(road.objectOnRoad.x <= car.x+car.width && road.objectOnRoad.x+road.objectOnRoad.width >= car.x+car.width ){
+                        gameOver()
+                    }
+                }
+            }
+            function gameOver(){
+                isGameOver = true
+                ctx.font = "25px Arial";
+                ctx.fillText("Game Over Your score "+score, canvas.height/2, canvas.width/2);
+                ctx = null;
+                
+            }
+            
             function moveSomething(e) {
-                //ctx.clearRect(xCordinate, yCorindate, rectangleWidth, rectangleHeight);
+                // drawCar()
                 switch(e.keyCode) {
                     case 37:
                         // left key pressed
                         if(xCordinate !=0){
-                            xCordinate -= 5;
+                            xCordinate -= 10;
+                            drawCar();
                         } else {
                             drawCar();
                         }
                         break;
                     case 39:
                         // right key pressed
-                        if(xCordinate != canvas.width-75){
-                            xCordinate += 5;
+                        if(xCordinate != canvas.width-rectangleWidth){
+                            xCordinate += 10;
+                            drawCar();
                         } else{
                             drawCar();
                         }
                         break;
                 }   
-                drawCar();
+                // drawCar();
             }
 
             
@@ -116,9 +182,11 @@
                 return Math.floor(Math.random() * (max - min + 1) + min)
             }
             function drawCar(){
-                var car = new Car(xCordinate, yCorindate, rectangleWidth, rectangleHeight)
+                
                 car.update()
                 car.delete()
+                
+                // var car = new Car(xCordinate, yCorindate, rectangleWidth, rectangleHeight)
                 car.draw()
             }
 
@@ -127,20 +195,22 @@
                         var y = canvas.height - onePieceRoadH * i;
                         var road;
                     if(i%2==0){
-                        road = new Road(xCordinateRoad,y,roadSizePx,onePieceRoadH,true);
+                        road = new Road(xCordinateRoad,y,roadSizePx,onePieceRoadH,true,null,null);
                     } else {
-                        road = new Road(xCordinateRoad,y,roadSizePx,onePieceRoadH,false);
+                        road = new Road(xCordinateRoad,y,roadSizePx,onePieceRoadH,false,null,null);
                     }
                     road.draw()
                     roadArray.push(road);
                 }
             }
-            function Road(x,y,width,height,whiteLine){
+            function Road(x,y,width,height,whiteLine,objectOnRoad, point){
                 this.x = x;
                 this.y = y;
                 this.width = width;
                 this.height = height;
                 this.whiteLine = whiteLine
+                this.objectOnRoad = objectOnRoad;
+                this.point = point;
             }
 
             Road.prototype = {
@@ -164,33 +234,108 @@
                         ctx.fillRect(this.x+this.width,this.y,apexWidth,this.height);
                         ctx.stroke();
                     }
-                   
+                    if(this.objectOnRoad!=null){
+                        this.objectOnRoad.draw()
+                    }
+                    if(this.point!=null){
+                        this.point.draw()
+                    }
                 },
                 update: function() {
+                    
+                    if(this.objectOnRoad!=null){
+                        this.objectOnRoad.update(this.y+this.height)
+                    }
+                    if(this.point!=null){
+                        this.point.update(this.y+this.height)
+                    }
                     this.y = this.y + this.height;
                 },
                 updateWithShiftPlus: function(variable,diffrentX){
                     this.y = this.y + this.height;
-                    if(this.x + variable <= canvas.width){
+                    if(this.x + variable + roadSizePx + apexWidth + apexWidth < canvas.width+apexWidth){
+                        if(this.objectOnRoad!=null){
+                            this.objectOnRoad.updateWithShiftPlus(variable,this.y+this.height)
+                        }
+                        if(this.point!=null){
+                            this.point.updateWithShiftPlus(variable,this.y+this.height)
+                        }
                         this.x = this.x + variable;
                     } else{
+                        if(this.objectOnRoad!=null){
+                            this.objectOnRoad.update(this.y+this.height)
+                        }
+                        if(this.point!=null){
+                            this.point.update(this.y+this.height)
+                        }
                         this.x = diffrentX
                     }
+                    
+                    
                     
                 },
                 updateWithShiftMinus: function(variable, diffrentX){
                     this.y = this.y + this.height;
                     if(this.x - variable > apexWidth){
+                        if(this.objectOnRoad!=null){
+                            this.objectOnRoad.updateWithShiftMinus(variable,this.y+this.height)
+                        }
+                        if(this.point!=null){
+                            this.point.updateWithShiftMinus(variable,this.y+this.height)
+                        }
                         this.x = this.x - variable;
                     } else{
+                        if(this.objectOnRoad!=null){
+                            this.objectOnRoad.update(this.y+this.height)
+                        }
+                        if(this.point!=null){
+                            this.point.update(this.y+this.height)
+                        }
                         this.x = diffrentX
                     }
+                    
+                    
                 },
                 delete: function(){
                     ctx.clearRect(this.x-apexWidth,this.y,this.width+apexWidth+apexWidth,this.height)
+                    if(this.objectOnRoad!=null){
+                        this.objectOnRoad.delete()
+                    }
+                    if(this.point!=null){
+                        this.point.delete()
+                    }
                 },
             }
 
+            function ObjectOnRoad(x,y){
+                this.x = x;
+                this.y = y;
+                this.width = 60;
+                this.height = 50;
+            }
+            ObjectOnRoad.prototype = {
+                draw: function() {
+                    ctx.beginPath();
+                    ctx.fillStyle = 'black'
+                    ctx.fillRect(this.x,this.y,this.width,this.height);
+                    ctx.stroke();
+                },
+                update: function(y) {
+                    this.y = y
+                    
+                },
+                updateWithShiftPlus:function(x,y){
+                    this.y = y
+                    this.x = this.x + x
+                },
+                updateWithShiftMinus: function(x,y){
+                    this.y = y
+                    this.x = this.x -x
+                },
+                delete: function(){
+                    ctx.clearRect(this.x,this.y,this.width,this.height)
+                },
+            }
 
             function Car(x, y, width, height) {
                 this.x = x;
@@ -202,15 +347,53 @@
             Car.prototype = {
                 draw: function() {
                     ctx.beginPath();
-                    ctx.fillStyle = 'red'
-                    ctx.fillRect(this.x,this.y,this.width,this.height);
+                    // ctx.fillStyle = 'red'
+                    // ctx.fillRect(this.x,this.y,this.width,this.height);
+                    ctx.drawImage(base_image, this.x, this.y, this.width, this.height);
                     ctx.stroke();
                 },
                 update: function() {
+                    
                     this.x = xCordinate;
+                    
                 },
                 delete: function(){
                     ctx.clearRect(this.x,this.y,this.width,this.height)
+                },
+            };
+
+            function Points(x, y,) {
+                this.x = x;
+                this.y = y+pointR*2;
+                this.r = pointR;
+                this.sAngle = 0
+                this.eAngle = 2 * Math.PI;
+                ctx.beginPath();
+            }
+
+            Points.prototype = {
+                draw: function() {
+                    ctx.beginPath();
+                    
+                    // ctx.fillRect(this.x,this.y,this.width,this.height);
+                    ctx.arc(this.x, this.y, this.r, this.sAngle, this.eAngle);
+                    ctx.fillStyle = 'gold';
+                    ctx.fill();
+                    
+                },
+                update: function(y) {
+                    this.y = y +pointR*2 
+                },
+                updateWithShiftPlus:function(x,y){
+                    this.y = y +pointR*2
+                    this.x = this.x + x
+                },
+                updateWithShiftMinus: function(x,y){
+                    this.y = y +pointR*2
+                    this.x = this.x -x
+                },
+                delete: function(){
+                    ctx.clearRect(this.x,this.y,this.r,this.r)
                 },
             };
 
