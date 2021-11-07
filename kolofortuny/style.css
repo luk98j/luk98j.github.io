@@ -13,20 +13,89 @@ body{
     width: 100%;
     border: 1px solid red; */
     width: 55%;
-    height: 55%;
+    height: 75%;
     border: 1px solid black;
     margin:auto;
-    display:flex;
-    align-items: center;
     background-color: aliceblue;
-    padding: 5%;
+    padding: 20px;
+}
+#userLetter{
+    display: none;
+}
+#setLetter{
+    display: none;
 }
 #authorInfo{
     display: none;
+    width: 60%;
+    height: 60%;
+    background-color: white;
+    position: fixed; 
+    z-index: 1;
+    border: 1px solid red;
+    border-radius: 10px;
+    font-size: x-large;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 7px;
+}
+#closeInfoAboutAuthor{
+    float: right;
+    display:inline-block;
+    padding:2px 5px;
+    background:#ccc;
+}
+#playGame{
     width: 20%;
-    height: 20%;
-    background-color: darkgrey;
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
+    height: 60px;
+}
+#getInfoAboutAuthor{
+    width: 20%;
+    height: 60px;
+}
+#life{
+    float: right;
+    display: none;
+}
+#points{
+    float: right;
+    display: none;
+}
+#lifeNumber{
+    float: right;
+}
+#pointNumber{
+    float: right;
+}
+.imageOfPoints{
+    height: 20px;
+    width: 20px;
+    margin-top: 14px;
+    margin-right: 10px;
+}
+.imageOfLife{
+    height: 30px;
+    width: 30px;
+    margin-top: 10px;
+    margin-right: 1px;
+}
+.columnPoints{
+    float: right;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+}
+#boadOfPoints{
+    display: none;
+    width: 80%;
+    height: 80%;
+    background-color: white;
+    position: fixed; 
+    z-index: 1;
+    border: 1px solid red;
+    border-radius: 10px;
+    font-size: x-large;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 7px;
 }

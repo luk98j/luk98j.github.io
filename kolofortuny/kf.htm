@@ -30,14 +30,30 @@
 		<div id="wrap">
 			<button id="playGame">GRAJ</button>
 			<button id="getInfoAboutAuthor">AUTHOR</button>
-			<input type="text" placeholder="wpisz litere" id="wpisz_litere" value="mojalitera"/>
-			
+			<div class="columnPoints">
+				<div id="life">
+					<img src="life.png" class="imageOfLife">
+					<p id="lifeNumber"></p>
+					
+				</div>
+				<div id="points">
+					<img src="point.png" class="imageOfPoints">
+					<p id="pointNumber"></p>
+					
+				</div>
+			</div>
+			<input type="text" placeholder="Podaj litere" id="userLetter" /> <button id="setLetter">Wprowadz</button>
 		</div>
 		<div id="authorInfo">
+			<button id="closeInfoAboutAuthor">X</button>
 			Imie: Łukasz <br>
 			Nazwisko: Jankowski <br>
 			Nr. albumu: 224816 <br>
 			Coś o mnie: Widzialem kolo fortuny dwa razy w zyciu <br>
+		</div>
+		<div id="boadOfPoints">
+			<button id="closeInfoAboutAuthor">X</button>
+			
 		</div>
 		<script type="text/javascript" src="countries.js"></script>		
 		<script type="text/javascript" src="fortuna.js"></script>
