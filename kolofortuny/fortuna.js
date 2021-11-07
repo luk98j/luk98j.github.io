@@ -8,10 +8,7 @@ var words = {
   actualWorld: "",
   listOfCountries: [],
 }
-window.addEventListener("load", function(){
-  addElement("wrap");
-  
-});
+addElement("wrap");
 
 //LISTENERS
 document.getElementById("playGame").addEventListener("click", startGame); 
