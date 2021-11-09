@@ -26,23 +26,29 @@
 		<link rel="stylesheet" type="text/css" href="style.css"/>
 	</head>
 	<body>
-		<!-- <div id="panstwa"></div> -->
 		<div id="wrap">
-			<button id="playGame">GRAJ</button>
-			<button id="getInfoAboutAuthor">AUTHOR</button>
-			<div class="columnPoints">
-				<div id="life">
-					<img src="life.png" class="imageOfLife">
-					<p id="lifeNumber"></p>
-					
+			<div class="centerButtons">
+				<button id="playGame">GRAJ</button>
+				<button id="getInfoAboutAuthor">AUTOR</button>
+			</div>
+			<div id="gamePanel">
+				<div class="columnPoints">
+					<div id="life">
+						<img src="life.png" class="imageOfLife">
+						<p id="lifeNumber"></p>
+						
+					</div>
+					<div id="points">
+						<img src="point.png" class="imageOfPoints">
+						<p id="pointNumber"></p>
+						
+					</div>
 				</div>
-				<div id="points">
-					<img src="point.png" class="imageOfPoints">
-					<p id="pointNumber"></p>
-					
+				<div id="drawnWord"></div>
+				<div class="panel">
+				<input type="text" placeholder="Podaj litere" id="userLetter" pattern="[A-Za-z]{1}"/> <button id="setLetter">Sprawdz!</button>
 				</div>
 			</div>
-			<input type="text" placeholder="Podaj litere" id="userLetter" /> <button id="setLetter">Wprowadz</button>
 		</div>
 		<div id="authorInfo">
 			<button id="closeInfoAboutAuthor">X</button>
@@ -51,9 +57,12 @@
 			Nr. albumu: 224816 <br>
 			Coś o mnie: Widzialem kolo fortuny dwa razy w zyciu <br>
 		</div>
-		<div id="boadOfPoints">
-			<button id="closeInfoAboutAuthor">X</button>
-			
+		<div id="theEnd">
+			<button id="closeInfoGame">X</button>
+			<h3>PRZEGRAŁEŚ!<br>
+			ZDOBYŁEŚ<br>
+			<p id="infoAboutGame"></p><br>
+			PUNKTÓW</h3>
 		</div>
 		<script type="text/javascript" src="countries.js"></script>		
 		<script type="text/javascript" src="fortuna.js"></script>
