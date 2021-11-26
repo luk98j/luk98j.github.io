@@ -1,0 +1,35 @@
+<!doctype html>
+	<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<link rel="stylesheet" type="text/css" href="style.css"/>
+	</head>
+	<body>
+        <div id="wrap">
+            <div id="form">
+                <form>
+                    <label for="year">Rok:</label><br>
+                    <input type="number" id="year" name="year"><br>
+                    <label for="month">Miesiac:</label><br>
+                    <input type="number" id="month" name="month"><br>
+                    <label for="day">Dzien:</label><br>
+                    <input type="number" id="day" name="day"><br>
+                    <label for="restOfPesel">Ostatnie 5 liczb peselu:</label><br>
+                    <input type="number" id="restOfPesel" name="restOfPesel"><br>
+                </form>
+                <button id="validatePesel">Waliduj Pesel</button>
+                <button id="generatePesel">Generuj Numery Pesel</button>
+                <button id="findValidatePesel">Znajdz Numery Pesel</button>
+                <div id="columns">
+                    <div id="peselIsOK">
+                       
+                    </div>
+                    <div id="allPesels"></div>
+                    <div id="peselsFromRest"></div>
+                </div>
+            </div>
+        </div>
+		<script type="text/javascript" src="validate.js"></script>		
+		
+	</body>
+	</html>

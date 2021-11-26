@@ -1,0 +1,40 @@
+#peselIsOK{
+    display: none;
+    border:1px solid black;
+    width: 25%;
+    height: 100px;
+    background-color: white;
+    text-align: center;
+    margin: 5px;
+}
+#allPesels{
+    display: none;
+    border:1px solid black;
+    width: 25%;
+    height: 500px;
+    overflow: auto;
+    background-color: white;
+    text-align: center;
+    margin: 5px;
+}
+#peselsFromRest{
+    display: none;
+    border:1px solid black;
+    width: 25%;
+    height: 500px;
+    overflow: auto;
+    background-color: white;
+    text-align: center;
+    margin: 5px;
+}
+#wrap{
+    width: 55%;
+    height: 75%;
+    border: 1px solid black;
+    margin:auto;
+    background-color: aliceblue;
+    padding: 20px;
+}
+#columns{
+    display: flex;
+}
