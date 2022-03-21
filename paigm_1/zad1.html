@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    padding: 0;
+    margin: auto;
+    display: block;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border: 1px solid black;
+}
+button{
+    
+}
+</style>
+</head>
+<body onload="startGame()">
+<script>
+
+var platform;
+var myObstacle;
+var myBall;
+var canvasWidth = 580;
+var canvasHeight = 370;
+var dx = 3
+var dy = 3
+var gameEnd = false;
+var stop = false;
+function startGame() {
+    platform = new component(100, 20, "red", canvasWidth/2, canvasHeight-25);
+    myBall = new ballObject(100,100, 10)
+    window.addEventListener("keydown", movePlatform, false) 
+    myGameArea.start();
+}
+
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        gameEnd = false
+        this.canvas.width = canvasWidth;
+        this.canvas.height = canvasHeight;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.interval = setInterval(updateGameArea, 30);
+    },
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    },
+    stop : function(){
+        stop = true;
+        clearInterval(this.interval)
+    },
+    restart : function(){
+        if(stop){
+            this.interval = setInterval(updateGameArea, 30);
+            stop = false
+        }
+        
+    },
+    endGame : function(){
+        gameEnd = true
+        clearInterval(this.interval)
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        //this.context = null
+
+    }
+
+}
+
+function component(width, height, color, x, y) {
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;    
+    this.update = function() {
+        ctx = myGameArea.context;
+        ctx.fillStyle = color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+    this.newPos = function() {
+        
+        if(this.x + this.speedX >canvasWidth - this.width){
+            moveleft()
+        } else if ( this.x + this.speedX < 0){
+            moveright()
+        } 
+        else {
+            this.x += this.speedX;
+            this.y += this.speedY;    
+        }
+            
+    }
+
+}
+
+function ballObject(x,y, radius){
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.color = "blue"
+
+    this.update = function() {
+        ctx = myGameArea.context;
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.stroke()
+    }
+
+    this.newPosition = function(){
+        console.log(this.x)
+        if(this.x + dx < platform.x + platform.width && this.x + dx > platform.x
+         && (this.y + dy > platform.y && this.y + dy < platform.y + platform.width)){
+            dx = dx;
+            dy = -dy
+        }
+        if(this.x + dx > canvasWidth - this.radius || this.x + dx < this.radius) {
+            dx = -dx;
+        }
+        if( this.y + dy < this.radius) {
+            dy = -dy;
+        }
+        if(this.y + dy > canvasHeight - this.radius){
+            console.log("GAME OVER")
+            myGameArea.endGame()
+        }
+        this.x += dx;
+        this.y += dy;  
+    }
+}
+
+function updateGameArea() {
+    
+    myGameArea.clear();
+    platform.newPos();    
+    platform.update();
+    myBall.newPosition();
+    myBall.update();
+}
+
+function moveleft() {
+    platform.speedX = -3; 
+}
+
+function moveright() {
+    platform.speedX = 3; 
+}
+
+function clearmove() {
+    platform.speedX = 0; 
+    platform.speedY = 0; 
+}
+
+function startOrRestart(){
+    if(gameEnd){
+        startGame()
+    } else {
+        myGameArea.restart()
+    }
+}
+
+function stopGame(){
+    myGameArea.stop()
+}
+
+function movePlatform(e) {
+                // drawCar()
+                switch(e.keyCode) {
+                    case 37:
+                        // left key pressed
+                        moveleft()
+                        break;
+                    case 39:
+                        // right key pressed
+                        moveright()
+                        break;
+                }   
+                // drawCar();
+            }
+
+</script>
+<div style="text-align:center;width:480px;margin:auto">
+    <button onmousedown="moveleft()" onmouseup="clearmove()" ontouchstart="moveleft()">LEFT</button>
+    <button onmousedown="moveright()" onmouseup="clearmove()" ontouchstart="moveright()">RIGHT</button>
+    <br><br>
+    <button onmousedown="startOrRestart()" onmouseup="clearmove()" ontouchstart="startOrRestart()">START</button>
+    <button onmousedown="stopGame()" onmouseup="clearmove()" ontouchstart="stopGame()">STOP</button>
+  </div>
+</body>
+</html>
