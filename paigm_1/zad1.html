@@ -26,49 +26,98 @@ var myObstacle;
 var myBall;
 var canvasWidth = 580;
 var canvasHeight = 370;
-var dx = 3
-var dy = 3
+var dx = 2
+var dy = 2
 var gameEnd = false;
 var stop = false;
+var bRowCount = 3;
+var bColCount = 10;
+var bHeight = 20;
+var bWidth = 50;
+var bPadding = 5;
+var bTopOffset = 10;
+var bLeftOffset = 10;
+var myRed = Math.floor(Math.random() * 256);
+var myGreen = Math.floor(Math.random() * 256);
+var myBlue = Math.floor(Math.random() * 256);
+var bricksArray = {}
+var points = 0;
+var startDate;
+var endDate;
+
 function startGame() {
     platform = new component(100, 20, "red", canvasWidth/2, canvasHeight-25);
-    myBall = new ballObject(100,100, 10)
+    myBall = new ballObject(100,100, 10, dx, dy)
     window.addEventListener("keydown", movePlatform, false) 
     myGameArea.start();
+}
+
+function createDb(){
+    var request = indexedDB.open("MyTestDatabase", 2);
+       
+    request.onupgradeneeded = event => {
+        var db = event.target.result;
+        var objStore = db.createObjectStore("gamePoint", { autoIncrement : true });
+    }
 }
 
 var myGameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
+        createDb()
         gameEnd = false
         this.canvas.width = canvasWidth;
         this.canvas.height = canvasHeight;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        startDate = new Date();
+        prepareBricks()
         this.interval = setInterval(updateGameArea, 30);
+        
     },
     clear : function() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     },
     stop : function(){
         stop = true;
+        
         clearInterval(this.interval)
     },
     restart : function(){
         if(stop){
             this.interval = setInterval(updateGameArea, 30);
             stop = false
+        } else {
+            points = 0;
         }
+        
         
     },
     endGame : function(){
+        endDate = new Date()
         gameEnd = true
         clearInterval(this.interval)
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        saveInDb()
         //this.context = null
 
     }
 
+}
+
+function collisionDetection() {
+    for (c = 0; c < bColCount; c++) {
+        for (r = 0; r < bRowCount; r++) {
+        
+            if (bricksArray[c][r].status == 1) {
+                if (myBall.x > bricksArray[c][r].x && myBall.x < bricksArray[c][r].x + bWidth && myBall.y > bricksArray[c][r].y && myBall.y < bricksArray[c][r].y + bHeight) {
+                //vertiSpeed = -vertiSpeed;
+                points += 5
+                bricksArray[c][r].status = 0;
+                }
+            }
+        }
+    }
 }
 
 function component(width, height, color, x, y) {
@@ -99,12 +148,81 @@ function component(width, height, color, x, y) {
 
 }
 
-function ballObject(x,y, radius){
+function brick(x,y,height,width, status, type, bonus){
+    this.x = x;
+    this.y = y;
+    //this.padding = padding;
+    this.height = height;
+    this.width = width;
+    this.status = status
+    this.type = type
+    this.color = 'rgb(' + (Math.floor(Math.random() * 156) + 100) + ',' + (Math.floor(Math.random() * 156) + 100) + ',' + (Math.floor(Math.random() * 156) + 100) + ')';
+    this.colorVersionB = 'rgb(0,0,0)';
+    this.bonus = bonus
+    this.create = function(){
+        ctx = myGameArea.context;
+        ctx.beginPath()
+        ctx.rect(this.x, this.y, this.width, this.height)
+        if(this.type == 'A'){
+            if(this.bonus != undefined){
+                console.log("XD")
+                //ctx.fillText("XD", this.x + this.width/2, this.y+ this.height/2)
+                ctx.font="20px Georgia";
+                ctx.textAlign="center"; 
+                ctx.textBaseline = "middle";
+                ctx.fillStyle = "border:1px solid #000000;";
+                
+            } else {
+                ctx.fillStyle = this.color
+            }
+            
+        } else {
+            ctx.fillStyle = this.colorVersionB
+        }
+        ctx.fill();
+        ctx.closePath()
+    }
+
+
+}
+
+function prepareBricks(){
+    for(c = 0; c < bColCount; c++){
+        bricksArray[c] = {}
+        for( r = 0; r < bRowCount; r++){
+            var number = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+            if(number % 2 == 0){
+                bricksArray[c][r] = new brick(0,0,bHeight,bWidth,1, 'A', 'bonus')
+            } else {
+                bricksArray[c][r] = new brick(0,0,bHeight,bWidth,1, 'B', undefined)
+            }
+            
+            
+        }
+    }
+}
+
+function drawBricks(){
+    for(c = 0; c < bColCount; c++){
+        for( r = 0; r < bRowCount; r++){
+            if(bricksArray[c][r].status ==1){
+                var bX = (c * (bWidth + bPadding)) + bLeftOffset
+                var bY = (r * (bHeight + bPadding)) + bTopOffset
+                bricksArray[c][r].x = bX;
+                bricksArray[c][r].y = bY;
+                bricksArray[c][r].create();
+            }
+        }
+    }
+}
+
+function ballObject(x,y, radius, dx, dy){
     this.x = x;
     this.y = y;
     this.radius = radius;
-    this.color = "blue"
-
+    this.color = "blue";
+    this.dx = dx;
+    this.dy = dy;
     this.update = function() {
         ctx = myGameArea.context;
         ctx.beginPath()
@@ -115,24 +233,47 @@ function ballObject(x,y, radius){
     }
 
     this.newPosition = function(){
-        console.log(this.x)
-        if(this.x + dx < platform.x + platform.width && this.x + dx > platform.x
-         && (this.y + dy > platform.y && this.y + dy < platform.y + platform.width)){
-            dx = dx;
-            dy = -dy
+        
+        if(this.x + this.dx < platform.x + platform.width && this.x + this.dx > platform.x
+         && (this.y + dy > platform.y && this.y + this.dy < platform.y + platform.width)){
+            console.log(this.d)
+            if(this.dx > 0){
+                this.dx = updateSpeedOfBall(this.x)
+            } else {
+                this.dx = -updateSpeedOfBall(this.x)
+            }
+            this.dy = -(updateSpeedOfBall(this.x))
         }
-        if(this.x + dx > canvasWidth - this.radius || this.x + dx < this.radius) {
-            dx = -dx;
+        if(this.x + this.dx > canvasWidth - this.radius || this.x + this.dx < this.radius) {
+            this.dx = -(this.dx)
         }
         if( this.y + dy < this.radius) {
-            dy = -dy;
+            this.dy = -(this.dy);
         }
         if(this.y + dy > canvasHeight - this.radius){
             console.log("GAME OVER")
             myGameArea.endGame()
         }
-        this.x += dx;
-        this.y += dy;  
+        this.x += this.dx;
+        this.y += this.dy;  
+    }
+}
+
+function updateSpeedOfBall(ballX){
+    // console.log(platform.x + platform.width)
+    // console.log(ballX)
+    var pointOfball = ballX - platform.x
+    
+    var percentage = (pointOfball * 100) / platform.width
+    console.log(percentage)
+    if(percentage < 10 || percentage > 90){
+        return dx * 3
+    } else if ((percentage >= 10 && percentage < 30) || (percentage > 70 && percentage <= 90)){
+        return dx * 2
+    }  else if ((percentage >= 30 && percentage < 40) || (percentage > 60 && percentage <= 70)) {
+        return dx * 1.5
+    } else if (percentage >= 40 && percentage <= 60){
+        return dx
     }
 }
 
@@ -143,14 +284,21 @@ function updateGameArea() {
     platform.update();
     myBall.newPosition();
     myBall.update();
+    collisionDetection()
+    drawBricks()
+    if(points == 150){
+        myGameArea.endGame()
+    }
+    document.getElementById('points').value= points 
+
 }
 
 function moveleft() {
-    platform.speedX = -3; 
+    platform.speedX = -6; 
 }
 
 function moveright() {
-    platform.speedX = 3; 
+    platform.speedX = 6; 
 }
 
 function clearmove() {
@@ -170,6 +318,37 @@ function stopGame(){
     myGameArea.stop()
 }
 
+function saveInDb(){
+    var db;
+    var request = indexedDB.open("MyTestDatabase");
+    request.onerror = event => {
+        console.log("Why didn't you allow my web app to use IndexedDB?!");
+    };
+    request.onsuccess = event => {
+        console.log(event.target.result)
+        db = event.target.result;
+        var tr = db.transaction(["gamePoint"], "readwrite"); 
+        var objstore = tr.objectStore("gamePoint"); 
+        var d = new Date()
+        //var dateFormat = dateNow.toLocaleDateString("en-US")
+        var datestring = d.getDate()  + "-" + (d.getMonth()+1) + "-" + d.getFullYear() + " " +
+                        d.getHours() + ":" + d.getMinutes();
+        console.log(datestring)
+        var object = {
+            "date":datestring,
+            "points": points,
+            "timeOfGame": diff(startDate, endDate),
+        }
+        objstore.put(object)
+    };
+    
+}
+
+function diff(start, end) {
+    var dif = ( end.getTime() - start.getTime() ) / 1000;
+    return dif
+}
+
 function movePlatform(e) {
                 // drawCar()
                 switch(e.keyCode) {
@@ -187,11 +366,12 @@ function movePlatform(e) {
 
 </script>
 <div style="text-align:center;width:480px;margin:auto">
-    <button onmousedown="moveleft()" onmouseup="clearmove()" ontouchstart="moveleft()">LEFT</button>
-    <button onmousedown="moveright()" onmouseup="clearmove()" ontouchstart="moveright()">RIGHT</button>
+    <button onclick="moveleft()">LEFT</button>
+    <button onclick="moveright()">RIGHT</button>
     <br><br>
     <button onmousedown="startOrRestart()" onmouseup="clearmove()" ontouchstart="startOrRestart()">START</button>
     <button onmousedown="stopGame()" onmouseup="clearmove()" ontouchstart="stopGame()">STOP</button>
+    <input type="text" disabled id="points">
   </div>
 </body>
 </html>
